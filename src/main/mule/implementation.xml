@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
-	xmlns:american-flight-api="http://www.mulesoft.org/schema/mule/american-flight-api"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:american-flight-api="http://www.mulesoft.org/schema/mule/american-flight-api" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/american-flight-api http://www.mulesoft.org/schema/mule/american-flight-api/current/mule-american-flight-api.xsd
 http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<flow name="getFlights" doc:id="60dccdcf-87ed-4ea6-9ff9-52ca71fc2737" >
 		<http:listener doc:name="GET/flights" doc:id="fcbffa96-662a-4404-92e2-768d03e83cc6" config-ref="HTTP_Listener_config" path="/flights" allowedMethods="GET" />
 		<set-variable value="#[message.attributes.queryParams.airline]" doc:name="airline" doc:id="5208a30c-92af-4329-9f1e-40be906fbe76" variableName="airline"/>
 		<flow-ref doc:name="setCode" doc:id="6d1ba82f-8f9a-4fca-b268-8c62cec99691" name="setCode"/>
+		<validation:is-true doc:name="Is Valid Destination" doc:id="cbd731b0-dd2c-4fed-9b95-56b28080767a" expression="#[['SFO','LAX','CLE','PDX','PDF'] contains vars.code]" message="#['Invalid destination' ++ ' ' ++ (vars.code default ' ')]"/>
 		<choice doc:name="Choice" doc:id="cb7779d6-cdf6-41a9-8631-81cd20adcbbf" >
 			<when expression='#[vars.airline == "american"]'>
 				<flow-ref doc:name="getAmericanFlights" doc:id="8f1d5e2b-3c25-4f06-b2bb-b579e65daf14" name="getAmericanFlights"/>
